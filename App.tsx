@@ -58,9 +58,16 @@ import HomeScreen from './src/screens/HomeScreen';
 // import { Portal } from 'react-native-paper';
 // import { Paths } from './src/navigation/paths';
 
+export type RootStackParamList = {
+  Splash: undefined; // no params
+  Login: undefined;
+  Register: { step?: number }; // optional param
+  Home: undefined;
+};
+
 export const queryClient = new QueryClient();
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // Loading component for PersistGate
 const PersistLoadingScreen = () => (
