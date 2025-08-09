@@ -18,19 +18,37 @@ import { DatePicker } from 'react-native-wheel-pick';
 import { onRegister } from '../../apis/onRegister';
 import { Paths } from '../../navigation/path';
 import { onUpdateDetails } from '../../apis/onUpdateDetails';
-import useDebounce from '../../hooks/useDebounce';
-import { usernameAvailability } from '../../apis/usernameAvailability';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../../redux/slice/authSlice';
-import CustomPhoneInput from '../../components/CustomPhoneInput/CustomPhoneInput';
+import CustomPhoneInput from '../../components/ui/CustomPhoneInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TOKEN } from '../../constants/AUTH';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { Avatar, Button } from 'react-native-paper';
+import { TOKEN } from '../../constant/AUTH';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import messaging from '@react-native-firebase/messaging';
 
-const PhoneNumberForm = ({ goNext, form, setForm }) => {
+interface Form {
+  phoneNumber: string;
+  dialCode: string;
+}
+
+interface RegisterProps {
+  goNext: () => void;
+  goBack: () => void;
+  form: Form;
+  otp: string;
+  setOtp: (otp: string) => void;
+  setTempToken: (token: string) => void;
+}
+
+const PhoneNumberForm = ({
+  goNext,
+  form,
+  setForm,
+}: {
+  goNext: () => void;
+  form: Form;
+  setForm: (form: Form) => void;
+}) => {
   const phoneInput = useRef(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -55,7 +73,7 @@ const PhoneNumberForm = ({ goNext, form, setForm }) => {
     navigation.navigate('Start');
   };
 
-  const onChangeNumber = number => {
+  const onChangeNumber = (number: string) => {
     const dialCode = phoneInput.current?.getCallingCode() || '';
 
     const sanitizedText = number.replace(/[^0-9]/g, '');
@@ -110,6 +128,13 @@ const PhoneNumberVerification = ({
   otp,
   setOtp,
   setTempToken,
+}: {
+  goNext: () => void;
+  goBack: () => void;
+  form: Form;
+  otp: string;
+  setOtp: (otp: string) => void;
+  setTempToken: (token: string) => void;
 }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -134,7 +159,7 @@ const PhoneNumberVerification = ({
     clearInterval(intervalRef.current);
   };
 
-  const onChangeOtp = currentOtp => {
+  const onChangeOtp = (currentOtp: string) => {
     setOtp(currentOtp);
   };
 
@@ -162,6 +187,10 @@ const PhoneNumberVerification = ({
       setIsValidating(true);
 
       const fcmToken = await getToken();
+
+      if (!fcmToken) {
+        throw new Error('FCM token not found');
+      }
 
       const payload = {
         phoneNumber: form.phoneNumber,
@@ -400,210 +429,6 @@ const BirthDateInput = ({ goNext, goBack, form, setForm }) => {
   );
 };
 
-const GenderSelect = ({ goNext, goBack, form, setForm }) => {
-  const GENDER_TYPES = [MALE, FEMALE, OTHER];
-  const ICON_MAPPING = {
-    [MALE]: require('./../../assets/images/gender-male.png'),
-    [FEMALE]: require('./../../assets/images/gender-female.png'),
-    [OTHER]: require('./../../assets/images/gender-other-icon.png'),
-  };
-
-  const selectedGender = form.gender;
-
-  const onGenderSelect = currentGender => {
-    setForm(prev => ({
-      ...prev,
-      gender: currentGender,
-    }));
-  };
-
-  return (
-    <View style={styles.genderFormContainer}>
-      <View style={styles.genderTopContainer}>
-        <TouchableOpacity onPress={goBack}>
-          <View style={styles.iconBox}>
-            <Icon name="chevron-back" size={30} color="#fff" />
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.genderTextContainer}>
-        <Text style={[FontStyles.heading, styles.genderHeaderText]}>
-          Choose your {'\n'}Gender?
-        </Text>
-      </View>
-      <View style={styles.genderSelectContainer}>
-        {GENDER_TYPES.map((gender, index) => (
-          <Pressable
-            key={gender}
-            style={[
-              styles.genderOptionContainer,
-              index !== GENDER_TYPES.length - 1 && styles.divider,
-              gender === selectedGender && styles.selectedGender,
-            ]}
-            onPress={() => onGenderSelect(gender)}
-          >
-            <View style={styles.genderOptionInnerContainer}>
-              <View style={styles.genderOptionBox}>
-                <Image
-                  source={ICON_MAPPING[gender]}
-                  style={styles.genderImage}
-                />
-              </View>
-            </View>
-            <Text
-              style={[
-                styles.genderOptionText,
-                gender === selectedGender && styles.selectedGender,
-              ]}
-            >
-              {gender}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <View style={styles.genderForwardContainer}>
-        <TouchableOpacity onPress={goNext}>
-          <View style={styles.nameInputIconBox}>
-            <Icon name="chevron-forward" size={30} color="#fff" />
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
-const UsernameInput = ({ goNext, goBack, form, setForm }) => {
-  const dispatch = useDispatch();
-  const username = form.username;
-
-  const [isAvailable, setIsAvailable] = useState(false);
-  const [isChecking, setIsChecking] = useState(false);
-  const debouncedUsername = useDebounce(username, 500);
-
-  const onChangeUsername = currentUsername => {
-    setForm(prev => ({
-      ...prev,
-      username: currentUsername,
-    }));
-  };
-
-  const onValidateUsername = () => {
-    if (username.length < 6) {
-      dispatch(
-        showSnackbar({
-          type: 'error',
-          title: 'Username must be at least 6 characters long',
-          placement: 'top',
-        }),
-      );
-
-      return;
-    }
-
-    if (!isAvailable) {
-      dispatch(
-        showSnackbar({
-          type: 'error',
-          title: 'Username is not available',
-          placement: 'top',
-        }),
-      );
-
-      return;
-    }
-
-    if (username.length > 5 && isAvailable) {
-      dispatch(
-        showSnackbar({
-          type: 'success',
-          title: 'Username is  available',
-          placement: 'top',
-        }),
-      );
-      setTimeout(() => {
-        goNext();
-      }, 1000);
-    }
-  };
-
-  useEffect(() => {
-    const checkUsernameAvailability = async () => {
-      if (debouncedUsername) {
-        setIsChecking(true);
-        try {
-          const apiResponse = await usernameAvailability({
-            payload: { username: debouncedUsername },
-          });
-
-          if (apiResponse?.response?.success) {
-            setIsAvailable(true);
-          }
-        } catch (error) {
-          console.error('Error checking username availability:', error);
-        } finally {
-          setIsChecking(false);
-        }
-      } else {
-        setIsAvailable(false);
-      }
-    };
-
-    if (debouncedUsername.length > 5) {
-      checkUsernameAvailability();
-    }
-  }, [debouncedUsername]);
-
-  return (
-    <>
-      <View style={styles.usernameFormContainer}>
-        <TouchableOpacity onPress={goBack}>
-          <View style={styles.iconBox}>
-            <Icon name="chevron-back" size={30} color="#fff" />
-          </View>
-        </TouchableOpacity>
-
-        <View style={styles.userNameInnerContainer}>
-          <Text style={[FontStyles.heading, styles.otpNumberTextSubHeader]}>
-            Enter Username
-          </Text>
-
-          <CustomTextInput
-            placeholder="Enter username"
-            value={username}
-            onChangeText={onChangeUsername}
-            autoFocus={true}
-          />
-
-          {isChecking ? (
-            <Text style={styles.loadingText}>Checking...</Text>
-          ) : username.length > 5 ? (
-            <>
-              {isAvailable === true && (
-                <Text style={styles.successText}>Username is available!</Text>
-              )}
-              {isAvailable === false && (
-                <Text style={styles.errorText}>Username is taken.</Text>
-              )}
-            </>
-          ) : (
-            <Text style={styles.errorText}>{''}</Text>
-          )}
-
-          <View style={styles.usernameInputIconContainer}>
-            <TouchableOpacity onPress={onValidateUsername}>
-              <View style={styles.nameInputIconBox}>
-                <Icon name="chevron-forward" size={30} color="#fff" />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </>
-  );
-};
-
 const PasswordInput = ({ goNext, goBack, form, setForm, tempToken }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -767,78 +592,6 @@ const PasswordInput = ({ goNext, goBack, form, setForm, tempToken }) => {
         </View>
       </View>
     </>
-  );
-};
-
-const ImageUploadScreen = ({ goNext, goBack, form, setForm }) => {
-  const [imageUri, setImageUri] = useState(form?.profilePicture?.uri || null);
-
-  const pickImage = async () => {
-    try {
-      launchImageLibrary(
-        {
-          mediaType: 'photo',
-          quality: 0.4,
-        },
-        response => {
-          if (response.didCancel) {
-            return;
-          }
-
-          if (response.errorCode) {
-            return;
-          }
-
-          if (response.assets && response.assets.length > 0) {
-            const asset = response.assets[0];
-            setImageUri(asset.uri);
-            setForm(prev => ({
-              ...prev,
-              profilePicture: asset,
-            }));
-          }
-        },
-      );
-    } catch (error) {
-      console.warn('Image picker error:', error);
-    }
-  };
-
-  return (
-    <View style={styles.imageUploadContainer}>
-      <TouchableOpacity onPress={goBack}>
-        <View style={styles.iconBox}>
-          <Icon name="chevron-back" size={30} color="#fff" />
-        </View>
-      </TouchableOpacity>
-      <View style={styles.avatarContainer}>
-        <Avatar.Image
-          size={120}
-          source={
-            imageUri
-              ? { uri: imageUri }
-              : require('../../assets/images/user.png')
-          }
-          style={styles.avatar}
-        />
-        <Button
-          mode="contained"
-          icon="camera"
-          onPress={pickImage}
-          style={styles.uploadButton}
-        >
-          Upload Image
-        </Button>
-      </View>
-
-      <View style={styles.imageIconContainer}>
-        <TouchableOpacity onPress={goNext}>
-          <View style={styles.nameInputIconBox}>
-            <Icon name="chevron-forward" size={30} color="#fff" />
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
   );
 };
 

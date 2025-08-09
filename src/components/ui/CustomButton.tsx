@@ -3,10 +3,23 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
 } from 'react-native';
 
 export const START = 'start';
 export const END = 'end';
+
+interface CustomButtonProps {
+  onClick: () => void;
+  title: string;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  isLoading?: boolean;
+  loadingPlacement?: 'start' | 'end';
+  disabled?: boolean;
+}
 
 const CustomButton = ({
   onClick,
@@ -16,7 +29,7 @@ const CustomButton = ({
   isLoading = false,
   loadingPlacement = END,
   disabled = false,
-}) => {
+}: CustomButtonProps) => {
   return (
     <TouchableOpacity
       style={[styles.buttonContainer, style]}

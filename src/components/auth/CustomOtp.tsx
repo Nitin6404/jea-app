@@ -1,6 +1,26 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TextInputProps, TextProps } from 'react-native';
 import React from 'react';
-import { OtpInput } from 'react-native-otp-entry';
+import { OtpInput, Theme } from 'react-native-otp-entry';
+
+interface CustomOtpProps {
+  numberOfDigits?: number;
+  focusColor?: string;
+  autoFocus?: boolean;
+  hideStick?: boolean;
+  placeholder?: string;
+  blurOnFilled?: boolean;
+  disabled?: boolean;
+  type?: 'numeric' | 'alphanumeric' | 'email' | 'phone';
+  secureTextEntry?: boolean;
+  focusStickBlinkingDuration?: number;
+  onFocus?: (event: FocusEvent) => void;
+  onBlur?: (event: FocusEvent) => void;
+  onTextChange?: (text: string) => void;
+  onFilled?: (text: string) => void;
+  textInputProps?: TextInputProps;
+  textProps?: TextProps;
+  theme?: Theme;
+}
 
 const CustomOtp = ({
   numberOfDigits = 6,
@@ -20,7 +40,7 @@ const CustomOtp = ({
   textInputProps,
   textProps,
   theme,
-}) => {
+}: CustomOtpProps) => {
   return (
     <OtpInput
       numberOfDigits={numberOfDigits}
