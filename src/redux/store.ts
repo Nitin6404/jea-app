@@ -25,3 +25,6 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
+
+// RootState type for use in selectors and throughout the app
+export type RootState = ReturnType<typeof store.getState>;

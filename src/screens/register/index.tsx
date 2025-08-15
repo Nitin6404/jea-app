@@ -40,14 +40,16 @@ interface RegisterProps {
   setTempToken: (token: string) => void;
 }
 
-const PhoneNumberForm = ({
+interface PhoneNumberFormProps {
+  goNext: () => void;
+  form: Form;
+  setForm: React.Dispatch<React.SetStateAction<Form>>;
+}
+
+const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
   goNext,
   form,
   setForm,
-}: {
-  goNext: () => void;
-  form: Form;
-  setForm: (form: Form) => void;
 }) => {
   const phoneInput = useRef(null);
   const navigation = useNavigation();
@@ -74,11 +76,9 @@ const PhoneNumberForm = ({
   };
 
   const onChangeNumber = (number: string) => {
-    const dialCode = phoneInput.current?.getCallingCode() || '';
-
+    const dialCode = (phoneInput.current as any)?.getCallingCode() || '';
     const sanitizedText = number.replace(/[^0-9]/g, '');
-
-    setForm(prev => ({
+    setForm((prev: Form) => ({
       ...prev,
       dialCode: dialCode,
       phoneNumber: sanitizedText,
@@ -121,24 +121,26 @@ const PhoneNumberForm = ({
   );
 };
 
-const PhoneNumberVerification = ({
-  goNext,
-  goBack,
-  form,
-  otp,
-  setOtp,
-  setTempToken,
-}: {
+interface PhoneNumberVerificationProps {
   goNext: () => void;
   goBack: () => void;
   form: Form;
   otp: string;
   setOtp: (otp: string) => void;
   setTempToken: (token: string) => void;
+}
+
+const PhoneNumberVerification: React.FC<PhoneNumberVerificationProps> = ({
+  goNext,
+  goBack,
+  form,
+  otp,
+  setOtp,
+  setTempToken,
 }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const intervalRef = useRef(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [time, setTime] = useState(30);
   const [isValidating, setIsValidating] = useState(false);
@@ -147,7 +149,7 @@ const PhoneNumberVerification = ({
     intervalRef.current = setInterval(() => {
       setTime(prevTime => {
         if (prevTime <= 1) {
-          clearInterval(intervalRef.current);
+          if (intervalRef.current) clearInterval(intervalRef.current);
           return 0;
         }
         return prevTime - 1;
@@ -156,7 +158,7 @@ const PhoneNumberVerification = ({
   };
 
   const stopTimer = () => {
-    clearInterval(intervalRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
   };
 
   const onChangeOtp = (currentOtp: string) => {
@@ -333,9 +335,22 @@ const PhoneNumberVerification = ({
   );
 };
 
-const NameInput = ({ goNext, goBack, form, setForm }) => {
-  const onChangeName = name => {
-    setForm(prev => ({
+interface NameInputProps {
+  goNext: () => void;
+  goBack: () => void;
+  form: any;
+  setForm: React.Dispatch<React.SetStateAction<any>>;
+  tempToken?: string | null;
+}
+
+const NameInput: React.FC<NameInputProps> = ({
+  goNext,
+  goBack,
+  form,
+  setForm,
+}) => {
+  const onChangeName = (name: string) => {
+    setForm((prev: any) => ({
       ...prev,
       name: name,
     }));
@@ -370,9 +385,21 @@ const NameInput = ({ goNext, goBack, form, setForm }) => {
   );
 };
 
-const BirthDateInput = ({ goNext, goBack, form, setForm }) => {
-  const onChangeDate = selectedDate => {
-    setForm(prev => ({
+interface BirthDateInputProps {
+  goNext: () => void;
+  goBack: () => void;
+  form: any;
+  setForm: React.Dispatch<React.SetStateAction<any>>;
+}
+
+const BirthDateInput: React.FC<BirthDateInputProps> = ({
+  goNext,
+  goBack,
+  form,
+  setForm,
+}) => {
+  const onChangeDate = (selectedDate: Date) => {
+    setForm((prev: any) => ({
       ...prev,
       dob: selectedDate,
     }));
@@ -429,11 +456,25 @@ const BirthDateInput = ({ goNext, goBack, form, setForm }) => {
   );
 };
 
-const PasswordInput = ({ goNext, goBack, form, setForm, tempToken }) => {
+interface PasswordInputProps {
+  goNext: () => void;
+  goBack: () => void;
+  form: any;
+  setForm: React.Dispatch<React.SetStateAction<any>>;
+  tempToken: string | null;
+}
+
+const PasswordInput: React.FC<PasswordInputProps> = ({
+  goNext,
+  goBack,
+  form,
+  setForm,
+  tempToken,
+}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState<boolean>(false);
 
   const onSubmit = async () => {
     if (isCreatingAccount) {
@@ -460,7 +501,7 @@ const PasswordInput = ({ goNext, goBack, form, setForm, tempToken }) => {
       formData.append('password', form.password);
 
       if (form.dob) {
-        formData.append('dob', form.dob.toISOString());
+        formData.append('dob', (form.dob as Date).toISOString());
       }
 
       if (form.profilePicture) {
@@ -468,7 +509,7 @@ const PasswordInput = ({ goNext, goBack, form, setForm, tempToken }) => {
           uri: form.profilePicture.uri,
           type: form.profilePicture.type || 'image/jpeg',
           name: form.profilePicture.fileName || 'profile.jpg',
-        });
+        } as any);
       }
 
       const apiResponse = await onUpdateDetails({
@@ -525,15 +566,15 @@ const PasswordInput = ({ goNext, goBack, form, setForm, tempToken }) => {
     }
   };
 
-  const onChangePassword = password => {
-    setForm(prev => ({
+  const onChangePassword = (password: string) => {
+    setForm((prev: any) => ({
       ...prev,
       password: password,
     }));
   };
 
-  const onChangeConfirmPassword = confirmPassword => {
-    setForm(prev => ({
+  const onChangeConfirmPassword = (confirmPassword: string) => {
+    setForm((prev: any) => ({
       ...prev,
       confirmPassword: confirmPassword,
     }));
@@ -541,13 +582,6 @@ const PasswordInput = ({ goNext, goBack, form, setForm, tempToken }) => {
 
   const password = form.password;
   const confirmPassword = form.confirmPassword;
-
-  // const onCloseSnackbar = () => {
-  //   setSnackbarState(prev => ({
-  //     ...prev,
-  //     visible: false,
-  //   }));
-  // };
 
   return (
     <>
@@ -595,11 +629,11 @@ const PasswordInput = ({ goNext, goBack, form, setForm, tempToken }) => {
   );
 };
 
-const Register = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [tempToken, setTempToken] = useState(null);
+const Register: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [tempToken, setTempToken] = useState<string | null>(null);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<any>({
     dialCode: '91',
     phoneNumber: '',
     name: '',
@@ -611,7 +645,7 @@ const Register = () => {
     profilePicture: null,
   });
 
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState<string>('');
 
   const goNext = () => {
     if (currentStep < 8) {
@@ -637,7 +671,6 @@ const Register = () => {
             goNext={goNext}
             goBack={goBack}
             form={form}
-            setForm={setForm}
             otp={otp}
             setOtp={setOtp}
             setTempToken={setTempToken}

@@ -7,7 +7,7 @@ export default function HomeScreen() {
     <View style={{ padding: 20 }}>
       <Text variant="headlineMedium">Hello Nitin!</Text>
       <Button mode="contained" onPress={() => console.log('Pressed')}>
-        Press me
+        Press me again
       </Button>
     </View>
   );
