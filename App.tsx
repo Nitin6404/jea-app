@@ -32,7 +32,7 @@ import { Provider, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor, RootState, store } from './src/redux/store';
 // import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PaperProvider, Portal } from 'react-native-paper';
+import { PaperProvider, Portal, useTheme } from 'react-native-paper';
 // import CustomSnackbar from './src/components/Snackbar/CustomSnackbar';
 // import Profile from './src/screens/Profile/Profile';
 // import ProfileViewScreen from './src/screens/Profile/ProfileViewScreen';
@@ -156,6 +156,7 @@ const requestNotificationPermission = async () => {
 const App = () => {
   const colorScheme = useColorScheme();
   console.log(colorScheme);
+  const color = useTheme();
   useEffect(() => {
     requestNotificationPermission();
   }, []);
@@ -181,13 +182,11 @@ const App = () => {
                   barStyle={
                     colorScheme === 'dark' ? 'light-content' : 'dark-content'
                   }
-                  backgroundColor="#181818"
+                  backgroundColor={color.colors.surface}
                   translucent={false}
                 />
                 <SafeAreaView style={styles.safeAreaContainer}>
-                  <PaperProvider
-                    theme={colorScheme === 'dark' ? DarkTheme : LightTheme}
-                  >
+                  <PaperProvider theme={color}>
                     <Portal.Host>
                       <RootNavigator />
                       {/* <CustomSnackbar /> */}

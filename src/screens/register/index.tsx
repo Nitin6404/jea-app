@@ -25,7 +25,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TOKEN } from '../../constant/AUTH';
 import { showSnackbar } from '../../redux/slice/snackbarSlice';
 import messaging from '@react-native-firebase/messaging';
-
+import LinearGradient from 'react-native-linear-gradient';
+import useThemeColors from '../../hooks/useThemeColors';
+import { Button } from 'react-native-paper';
 interface Form {
   phoneNumber: string;
   dialCode: string;
@@ -54,6 +56,8 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
   const phoneInput = useRef(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const { colors } = useThemeColors();
 
   const onUserRegister = async () => {
     const phoneNumberLength = form.phoneNumber.length;
@@ -87,18 +91,34 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
 
   return (
     <>
-      <View style={styles.phoneNumberFormContainer}>
+      <LinearGradient
+        colors={['#CEFFCF', '#F7FBF2', '#F7FBF2', '#F7FBF2']}
+        style={styles.phoneNumberFormContainer}
+      >
         <View style={styles.phoneNumberTopContainer}>
-          <TouchableOpacity onPress={onStartScreen}>
-            <View style={styles.iconBox}>
-              <Icon name="chevron-back" size={30} color="#fff" />
-            </View>
-          </TouchableOpacity>
-
           <View style={styles.phoneInputContainer}>
-            <Text style={[styles.headingText, FontStyles.heading]}>
-              Phone number
-            </Text>
+            {/* Header Section */}
+            <View style={styles.phoneInputHeaderContainer}>
+              <Text
+                style={[
+                  styles.phoneInputHeaderWelcomeText,
+                  { color: colors.primary },
+                ]}
+              >
+                Welcome!
+              </Text>
+              <Text style={styles.phoneInputHeaderToText}>
+                to Jamia Entrance Adda
+              </Text>
+            </View>
+
+            {/* Image Section */}
+            <View style={styles.phoneInputImageContainer}>
+              <Image
+                source={require('../../assets/images/education-students.png')}
+                style={styles.phoneInputImage}
+              />
+            </View>
 
             <View style={styles.phoneFormContainer}>
               <CustomPhoneInput
@@ -108,15 +128,34 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
                 autoFocus={true}
               />
             </View>
-            <CustomButton
-              title="Send Verification Code"
-              onClick={onUserRegister}
-            />
+
+            <CustomButton title="Continue" onClick={onUserRegister} />
+            <View
+              style={{
+                alignItems: 'center',
+                paddingVertical: 5,
+              }}
+            >
+              <Text>--- OR ---</Text>
+            </View>
+            <Button
+              icon={require('../../assets/icons/google.png')}
+              mode="outlined"
+              buttonColor="#fff"
+              textColor="#181D18"
+              onPress={onStartScreen}
+              style={{
+                width: '100%',
+                borderRadius: 8,
+              }}
+            >
+              Sign In WIth Google
+            </Button>
           </View>
         </View>
 
         <UserAgreement />
-      </View>
+      </LinearGradient>
     </>
   );
 };
@@ -296,12 +335,6 @@ const PhoneNumberVerification: React.FC<PhoneNumberVerificationProps> = ({
   return (
     <>
       <View style={styles.phoneOtpContainer}>
-        <View style={styles.iconBox}>
-          <TouchableOpacity onPress={goBack}>
-            <Icon name="chevron-back" size={30} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.otpNumberContainer}>
           <Text style={styles.otpNumberTextHeader}>
             Verification code has been sent to{' '}
@@ -385,250 +418,6 @@ const NameInput: React.FC<NameInputProps> = ({
   );
 };
 
-interface BirthDateInputProps {
-  goNext: () => void;
-  goBack: () => void;
-  form: any;
-  setForm: React.Dispatch<React.SetStateAction<any>>;
-}
-
-const BirthDateInput: React.FC<BirthDateInputProps> = ({
-  goNext,
-  goBack,
-  form,
-  setForm,
-}) => {
-  const onChangeDate = (selectedDate: Date) => {
-    setForm((prev: any) => ({
-      ...prev,
-      dob: selectedDate,
-    }));
-  };
-
-  const selectedDate = form.dob ? form.dob : new Date();
-
-  return (
-    <View style={styles.birthDateFormContainer}>
-      <View style={styles.birthDateTopContainer}>
-        <TouchableOpacity onPress={goBack}>
-          <View style={styles.iconBox}>
-            <Icon name="chevron-back" size={30} color="#fff" />
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.birthDateTextContainer}>
-        <Text style={[FontStyles.heading, styles.birthDateHeaderText]}>
-          What's your date of {'\n'}Birth?
-        </Text>
-      </View>
-      <View style={styles.dateSelectContainer}>
-        <DatePicker
-          date={selectedDate}
-          style={styles.datePickerStyles}
-          maximumDate={new Date()}
-          onDateChange={onChangeDate}
-          minimumDate={new Date(1990, 0, 1)}
-          textColor="#fff"
-          dividerColor="#fff"
-        />
-        {/* <DatePicker mode="date" textColor="green" /> */}
-        {/* <DatePicker
-          date={date}
-          onDateChange={setDate}
-          mode="date"
-          maximumDate={new Date()}
-          minimumDate={new Date(1900, 0, 1)}
-          dividerColor="#fff"
-          theme="dark"
-          locale="en-US"
-        /> */}
-      </View>
-
-      <View style={styles.birthDateMainContainer}>
-        <TouchableOpacity onPress={goNext}>
-          <View style={styles.nameInputIconBox}>
-            <Icon name="chevron-forward" size={30} color="#fff" />
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
-interface PasswordInputProps {
-  goNext: () => void;
-  goBack: () => void;
-  form: any;
-  setForm: React.Dispatch<React.SetStateAction<any>>;
-  tempToken: string | null;
-}
-
-const PasswordInput: React.FC<PasswordInputProps> = ({
-  goNext,
-  goBack,
-  form,
-  setForm,
-  tempToken,
-}) => {
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
-
-  const [isCreatingAccount, setIsCreatingAccount] = useState<boolean>(false);
-
-  const onSubmit = async () => {
-    if (isCreatingAccount) {
-      return;
-    }
-
-    try {
-      setIsCreatingAccount(true);
-
-      if (form.password !== form.confirmPassword) {
-        dispatch(
-          showSnackbar({
-            type: 'error',
-            title: 'Passwords do not match',
-            placement: 'top',
-          }),
-        );
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('name', form.name);
-      formData.append('username', form.username);
-      formData.append('password', form.password);
-
-      if (form.dob) {
-        formData.append('dob', (form.dob as Date).toISOString());
-      }
-
-      if (form.profilePicture) {
-        formData.append('profilePicture', {
-          uri: form.profilePicture.uri,
-          type: form.profilePicture.type || 'image/jpeg',
-          name: form.profilePicture.fileName || 'profile.jpg',
-        } as any);
-      }
-
-      const apiResponse = await onUpdateDetails({
-        payload: formData,
-        token: tempToken,
-      });
-
-      if (apiResponse?.response?.success) {
-        dispatch(
-          showSnackbar({
-            type: 'success',
-            title: 'Account created successfully',
-            placement: 'top',
-          }),
-        );
-        const data = apiResponse?.response?.data;
-
-        dispatch(
-          loginUser({
-            token: tempToken,
-            user: {
-              id: data?._id,
-              name: data?.name,
-              username: data?.username,
-              phoneNumber: data?.phoneNumber,
-              email: data?.email,
-            },
-          }),
-        );
-        await AsyncStorage.setItem(TOKEN, tempToken);
-
-        // navigation.navigate(Paths.MAIN_SCREEN);
-      } else {
-        const errrorMessage = apiResponse?.response?.message;
-        dispatch(
-          showSnackbar({
-            type: 'error',
-            title: errrorMessage || 'Error creating account, please try again',
-            placement: 'top',
-          }),
-        );
-      }
-    } catch (error) {
-      console.error(error);
-      dispatch(
-        showSnackbar({
-          type: 'error',
-          title: 'Error creating account, please try again',
-          placement: 'top',
-        }),
-      );
-    } finally {
-      setIsCreatingAccount(false);
-    }
-  };
-
-  const onChangePassword = (password: string) => {
-    setForm((prev: any) => ({
-      ...prev,
-      password: password,
-    }));
-  };
-
-  const onChangeConfirmPassword = (confirmPassword: string) => {
-    setForm((prev: any) => ({
-      ...prev,
-      confirmPassword: confirmPassword,
-    }));
-  };
-
-  const password = form.password;
-  const confirmPassword = form.confirmPassword;
-
-  return (
-    <>
-      <View style={styles.passwordFormContainer}>
-        <TouchableOpacity onPress={goBack}>
-          <View style={styles.iconBox}>
-            <Icon name="chevron-back" size={30} color="#fff" />
-          </View>
-        </TouchableOpacity>
-
-        <View style={styles.passwordInnerContainer}>
-          <Text style={[FontStyles.heading, styles.otpNumberTextSubHeader]}>
-            Set Password
-          </Text>
-
-          <CustomTextInput
-            placeholder="Enter password"
-            value={password}
-            onChangeText={onChangePassword}
-            autoFocus={true}
-          />
-        </View>
-
-        <View style={styles.passwordInnerContainer}>
-          <Text style={[FontStyles.heading, styles.otpNumberTextSubHeader]}>
-            Confirm Password
-          </Text>
-
-          <CustomTextInput
-            placeholder="Confirm password"
-            value={confirmPassword}
-            onChangeText={onChangeConfirmPassword}
-          />
-        </View>
-
-        <View style={styles.createAccountButtonContainer}>
-          <CustomButton
-            title="Create Account"
-            onClick={onSubmit}
-            isLoading={isCreatingAccount}
-          />
-        </View>
-      </View>
-    </>
-  );
-};
-
 const Register: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [tempToken, setTempToken] = useState<string | null>(null);
@@ -686,52 +475,6 @@ const Register: React.FC = () => {
             tempToken={tempToken}
           />
         );
-      case 4:
-        return (
-          <BirthDateInput
-            goNext={goNext}
-            goBack={goBack}
-            form={form}
-            setForm={setForm}
-          />
-        );
-      case 5:
-        return (
-          <GenderSelect
-            goNext={goNext}
-            goBack={goBack}
-            form={form}
-            setForm={setForm}
-          />
-        );
-      case 6:
-        return (
-          <UsernameInput
-            goNext={goNext}
-            goBack={goBack}
-            form={form}
-            setForm={setForm}
-          />
-        );
-      case 7:
-        return (
-          <ImageUploadScreen
-            goNext={goNext}
-            goBack={goBack}
-            form={form}
-            setForm={setForm}
-          />
-        );
-      case 8:
-        return (
-          <PasswordInput
-            goNext={goNext}
-            goBack={goBack}
-            form={form}
-            setForm={setForm}
-            tempToken={tempToken}
-          />
-        );
       default:
         return null;
     }
@@ -774,7 +517,7 @@ const styles = StyleSheet.create({
   // Phone Number Form Styles
   phoneNumberFormContainer: {
     flex: 1,
-    backgroundColor: '#181818',
+    // background: linear-gradient(180deg, #CEFFCF 0%, #F7FBF2 25%, #F7FBF2 50%, #F7FBF2 100%);
     justifyContent: 'space-between',
   },
   phoneNumberTopContainer: {
@@ -798,6 +541,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#181818',
   },
+  phoneInputHeaderContainer: {
+    display: 'flex',
+    gap: 8,
+    // paddingTop: 80,
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  phoneInputHeaderWelcomeText: {
+    fontSize: 26,
+    fontWeight: 'semibold',
+  },
+  phoneInputHeaderToText: {
+    fontSize: 22,
+    fontWeight: 'medium',
+  },
+  phoneInputImageContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  phoneInputImage: {
+    width: 250,
+    height: 250,
+  },
+
   otpNumberContainer: {
     display: 'flex',
     alignItems: 'center',

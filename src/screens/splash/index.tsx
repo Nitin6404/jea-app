@@ -7,7 +7,10 @@ import {
   Dimensions,
   Easing,
 } from 'react-native';
+import { useColorScheme } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import { LightTheme } from '../../theme/light';
+import { DarkTheme } from '../../theme/dark';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '../../navigation/path';
 
@@ -15,7 +18,8 @@ const { width, height } = Dimensions.get('window');
 
 const Splash = () => {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const colorScheme = useColorScheme();
+  const { colors } = useTheme(colorScheme === 'dark' ? DarkTheme : LightTheme);
 
   const logoAnim = useRef(new Animated.Value(0)).current; // opacity + scale
   const revealAnim = useRef(new Animated.Value(0)).current; // circular scale

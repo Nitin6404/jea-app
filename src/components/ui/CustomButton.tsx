@@ -7,6 +7,8 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
+import useThemeColors from '../../hooks/useThemeColors';
+import { Button } from 'react-native-paper';
 
 export const START = 'start';
 export const END = 'end';
@@ -30,9 +32,15 @@ const CustomButton = ({
   loadingPlacement = END,
   disabled = false,
 }: CustomButtonProps) => {
+  const { colors } = useThemeColors();
+
   return (
     <TouchableOpacity
-      style={[styles.buttonContainer, style]}
+      style={[
+        styles.buttonContainer,
+        style,
+        { backgroundColor: disabled ? colors.onSurface : colors.primary },
+      ]}
       onPress={onClick}
       disabled={disabled}
       accessibilityLabel={title}
@@ -57,8 +65,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#D28A8C',
-    borderRadius: 60,
+    borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 30,
     width: '100%',
