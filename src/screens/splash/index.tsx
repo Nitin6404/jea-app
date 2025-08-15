@@ -1,37 +1,89 @@
-import React from 'react';
-import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-// import Icon from 'react-native-vector-icons/FontAwesome5';
+import React, { useEffect, useRef } from 'react';
+import {
+  StyleSheet,
+  View,
+  Image,
+  Animated,
+  Dimensions,
+  Easing,
+} from 'react-native';
+import { useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { Paths } from '../../navigation/path';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const { width, height } = Dimensions.get('window');
 
 const Splash = () => {
   const navigation = useNavigation();
+  const { colors } = useTheme();
 
-  const onNextPress = () => {
-    navigation.navigate(Paths.START);
+  const logoAnim = useRef(new Animated.Value(0)).current; // opacity + scale
+  const revealAnim = useRef(new Animated.Value(0)).current; // circular scale
+
+  useEffect(() => {
+    // Step 1: Delay before showing logo
+    setTimeout(() => {
+      Animated.spring(logoAnim, {
+        toValue: 1,
+        friction: 4,
+        useNativeDriver: true,
+      }).start();
+    }, 500);
+
+    // Step 2: Delay before circular reveal
+    setTimeout(() => {
+      Animated.timing(revealAnim, {
+        toValue: 1,
+        duration: 1000,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start(() => {
+        // Step 3: Navigate after animation
+        navigation.navigate(Paths.REGISTER);
+      });
+    }, 1000);
+  }, []);
+
+  // Circular reveal scaling
+  const circleSize = Math.sqrt(width * width + height * height) * 2;
+  const circleStyle = {
+    width: circleSize,
+    height: circleSize,
+    borderRadius: circleSize / 2,
+    backgroundColor: '#16A244',
+    position: 'absolute',
+    top: height / 2 - circleSize / 2,
+    left: width / 2 - circleSize / 2,
+    transform: [{ scale: revealAnim }],
   };
 
   return (
-    <LinearGradient
-      colors={['#D28A8C', '#281E14']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      <View style={styles.logoContainer}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
+      {/* Circular reveal layer */}
+      <Animated.View style={circleStyle} />
+
+      {/* Logo */}
+      <Animated.View
+        style={{
+          opacity: logoAnim,
+          transform: [
+            {
+              scale: logoAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.5, 1],
+              }),
+            },
+          ],
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <Image
           source={require('./../../assets/images/brand-logo.png')}
           style={styles.logo}
         />
-        <Text style={styles.text}>Connect and Communicate!</Text>
-      </View>
-
-      <TouchableOpacity onPress={onNextPress} style={styles.iconContainer}>
-        <Icon name="arrow-right" size={30} color="#fff" />
-      </TouchableOpacity>
-    </LinearGradient>
+      </Animated.View>
+    </View>
   );
 };
 
@@ -43,26 +95,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   logo: {
     width: 150,
     height: 150,
     resizeMode: 'contain',
-  },
-  text: {
-    marginTop: 20,
-    fontSize: 20,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  iconContainer: {
-    position: 'absolute',
-    bottom: 50,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    padding: 15,
-    borderRadius: 50,
   },
 });
