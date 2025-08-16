@@ -33,15 +33,6 @@ interface Form {
   dialCode: string;
 }
 
-interface RegisterProps {
-  goNext: () => void;
-  goBack: () => void;
-  form: Form;
-  otp: string;
-  setOtp: (otp: string) => void;
-  setTempToken: (token: string) => void;
-}
-
 interface PhoneNumberFormProps {
   goNext: () => void;
   form: Form;
@@ -53,16 +44,13 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
   form,
   setForm,
 }) => {
-  const phoneInput = useRef(null);
+  const phoneInput = useRef<any>(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
   const { colors } = useThemeColors();
 
-  const onUserRegister = async () => {
-    const phoneNumberLength = form.phoneNumber.length;
-
-    if (phoneNumberLength === 10) {
+  const onUserRegister = () => {
+    if (form.phoneNumber.length === 10) {
       goNext();
     } else {
       dispatch(
@@ -76,29 +64,28 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
   };
 
   const onStartScreen = () => {
-    navigation.navigate('Start');
+    navigation.navigate('Start' as never);
   };
 
   const onChangeNumber = (number: string) => {
-    const dialCode = (phoneInput.current as any)?.getCallingCode() || '';
-    const sanitizedText = number.replace(/[^0-9]/g, '');
-    setForm((prev: Form) => ({
+    const dialCode = phoneInput.current?.getCallingCode?.() || '';
+    setForm(prev => ({
       ...prev,
-      dialCode: dialCode,
-      phoneNumber: sanitizedText,
+      dialCode,
+      phoneNumber: number.replace(/[^0-9]/g, ''),
     }));
   };
 
   return (
-    <>
-      <LinearGradient
-        colors={['#CEFFCF', '#F7FBF2', '#F7FBF2', '#F7FBF2']}
-        style={styles.phoneNumberFormContainer}
-      >
-        <View style={styles.phoneNumberTopContainer}>
-          <View style={styles.phoneInputContainer}>
-            {/* Header Section */}
-            <View style={styles.phoneInputHeaderContainer}>
+    <LinearGradient
+      colors={['#CEFFCF', '#F7FBF2', '#F7FBF2', '#F7FBF2']}
+      style={styles.phoneNumberFormContainer}
+    >
+      <View style={styles.phoneNumberTopContainer}>
+        <View style={styles.phoneInputContainer}>
+          {/* Header */}
+          <View style={styles.phoneInputHeaderContainer}>
+            <View style={{ alignItems: 'center', gap: 4 }}>
               <Text
                 style={[
                   styles.phoneInputHeaderWelcomeText,
@@ -111,55 +98,46 @@ const PhoneNumberForm: React.FC<PhoneNumberFormProps> = ({
                 to Jamia Entrance Adda
               </Text>
             </View>
-
-            {/* Image Section */}
             <View style={styles.phoneInputImageContainer}>
               <Image
                 source={require('../../assets/images/education-students.png')}
                 style={styles.phoneInputImage}
               />
             </View>
+          </View>
 
-            <View style={styles.phoneFormContainer}>
-              <CustomPhoneInput
-                ref={phoneInput}
-                value={form.phoneNumber}
-                onChangeText={onChangeNumber}
-                autoFocus={true}
-              />
-            </View>
-
+          {/* Form */}
+          <View style={styles.phoneFormContainer}>
+            <CustomPhoneInput
+              ref={phoneInput}
+              value={form.phoneNumber}
+              onChangeText={onChangeNumber}
+              autoFocus={true}
+            />
             <CustomButton title="Continue" onClick={onUserRegister} />
-            <View
-              style={{
-                alignItems: 'center',
-                paddingVertical: 5,
-              }}
-            >
+
+            <View style={{ alignItems: 'center', paddingVertical: 5 }}>
               <Text>--- OR ---</Text>
             </View>
+
             <Button
               icon={require('../../assets/icons/google.png')}
               mode="outlined"
               buttonColor="#fff"
               textColor="#181D18"
               onPress={onStartScreen}
-              style={{
-                width: '100%',
-                borderRadius: 8,
-              }}
+              style={{ width: '100%', borderRadius: 8 }}
             >
-              Sign In WIth Google
+              Sign In With Google
             </Button>
           </View>
         </View>
+      </View>
 
-        <UserAgreement />
-      </LinearGradient>
-    </>
+      <UserAgreement />
+    </LinearGradient>
   );
 };
-
 interface PhoneNumberVerificationProps {
   goNext: () => void;
   goBack: () => void;
@@ -527,6 +505,7 @@ const styles = StyleSheet.create({
   phoneInputContainer: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 32,
     paddingHorizontal: 40,
   },
@@ -544,7 +523,7 @@ const styles = StyleSheet.create({
   phoneInputHeaderContainer: {
     display: 'flex',
     gap: 8,
-    // paddingTop: 80,
+    paddingTop: 80,
     paddingVertical: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -562,6 +541,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    padding: 0,
+    margin: 0,
   },
   phoneInputImage: {
     width: 250,

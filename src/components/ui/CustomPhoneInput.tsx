@@ -1,12 +1,8 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import PhoneInput from 'react-native-phone-number-input';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useTheme } from 'react-native-paper';
-import { LightTheme } from '../../theme/light';
-import { DarkTheme } from '../../theme/dark';
-import { useColorScheme } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import useThemeColors from '../../hooks/useThemeColors';
 
 interface CustomPhoneInputProps {
   value: string;
@@ -14,7 +10,7 @@ interface CustomPhoneInputProps {
   defaultCode?: string;
   autoFocus?: boolean;
   maxLength?: number;
-  error?: boolean; // added for error state
+  error?: boolean;
 }
 
 const CustomPhoneInput = forwardRef<PhoneInput, CustomPhoneInputProps>(
@@ -29,10 +25,8 @@ const CustomPhoneInput = forwardRef<PhoneInput, CustomPhoneInputProps>(
     },
     ref,
   ) => {
-    const colorScheme = useColorScheme();
-    const { colors } = useTheme(
-      colorScheme === 'dark' ? DarkTheme : LightTheme,
-    );
+    const { colors } = useThemeColors();
+    const [isFocused, setIsFocused] = useState(false);
 
     const handleTextChange = (text: string) => {
       const sanitizedText = text.replace(/[^0-9]/g, '');
@@ -51,51 +45,32 @@ const CustomPhoneInput = forwardRef<PhoneInput, CustomPhoneInputProps>(
           <Icon name="chevron-down" size={20} color={colors.primary} />
         }
         textInputProps={{
-          placeholderTextColor: colors.onPrimary,
-          cursorColor: colors.onPrimary,
+          placeholderTextColor: colors.onSurfaceVariant,
+          cursorColor: colors.primary,
           keyboardType: 'phone-pad',
           autoFocus,
           maxLength,
+          onFocus: () => setIsFocused(true),
+          onBlur: () => setIsFocused(false),
         }}
         countryPickerProps={{ withFlag: true }}
-        withDarkTheme
         containerStyle={[
           styles.phoneInputLibContainer,
           {
-            backgroundColor: 'transparent',
-            borderColor: error ? colors.error : colors.outline,
+            borderColor: error
+              ? colors.error
+              : isFocused
+              ? colors.primary
+              : colors.outline,
           },
         ]}
         textContainerStyle={[
           styles.textInputContainer,
-          { backgroundColor: 'transparent' },
+          { backgroundColor: 'transparent', paddingVertical: 2 },
         ]}
-        textInputStyle={[styles.textInputStyle, { color: colors.onPrimary }]}
-        codeTextStyle={[styles.codeTextStyle, { color: colors.onPrimary }]}
+        textInputStyle={[styles.textInputStyle, { color: colors.onSurface }]}
+        codeTextStyle={[styles.codeTextStyle, { color: colors.onSurface }]}
       />
-
-      // <TextInput
-      //   ref={ref}
-      //   value={value}
-      //   onChangeText={handleTextChange}
-      //   placeholder="Enter phone number"
-      //   placeholderTextColor={colors.onPrimary}
-      //   // cursorColor={colors.onPrimary}
-      //   keyboardType="phone-pad"
-      //   autoFocus={autoFocus}
-      //   maxLength={maxLength}
-      //   mode="outlined"
-      //   outlineColor={error ? colors.error : colors.outline}
-      //   style={[
-      //     // styles.phoneInputLibContainer,
-      //     {
-      //       backgroundColor: 'transparent',
-      //       // borderColor: colors.outline,
-      //       // borderWidth: 2,
-      //       // borderColor: error ? colors.error : colors.outline,
-      //     },
-      //   ]}
-      // />
     );
   },
 );
@@ -119,8 +94,10 @@ const styles = StyleSheet.create({
   },
   textInputStyle: {
     margin: 0,
+    fontSize: 16,
   },
   codeTextStyle: {
     marginLeft: 20,
+    fontSize: 16,
   },
 });

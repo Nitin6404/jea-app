@@ -182,8 +182,9 @@ const App = () => {
                   barStyle={
                     colorScheme === 'dark' ? 'light-content' : 'dark-content'
                   }
-                  backgroundColor={color.colors.surface}
-                  translucent={false}
+                  backgroundColor="transparent"
+                  // translucent={true}
+                  hidden={true}
                 />
                 <SafeAreaView style={styles.safeAreaContainer}>
                   <PaperProvider theme={color}>
