@@ -1,4 +1,8 @@
-import { StyleSheet, TextInputProps, TextProps } from 'react-native';
+import {
+  StyleSheet,
+  TextInputProps,
+  TextProps,
+} from 'react-native';
 import React from 'react';
 import { OtpInput, Theme } from 'react-native-otp-entry';
 import useThemeColors from '../../hooks/useThemeColors';
@@ -11,11 +15,11 @@ interface CustomOtpProps {
   placeholder?: string;
   blurOnFilled?: boolean;
   disabled?: boolean;
-  type?: 'numeric' | 'alphanumeric' | 'email' | 'phone';
+  type?: 'numeric' | 'alphanumeric' | 'alpha';
   secureTextEntry?: boolean;
   focusStickBlinkingDuration?: number;
-  onFocus?: (event: FocusEvent) => void;
-  onBlur?: (event: FocusEvent) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   onTextChange?: (text: string) => void;
   onFilled?: (text: string) => void;
   textInputProps?: TextInputProps;
@@ -90,7 +94,7 @@ const CustomOtp = ({
         disabledPinCodeContainerStyle: {
           borderColor: colors.primary,
         },
-        ...theme,
+        ...theme, // allow overrides
       }}
     />
   );

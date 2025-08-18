@@ -17,12 +17,12 @@ export const FontStyles = {
   },
   heading: {
     fontSize: 28,
-    fontWeight: '600',
+    fontWeight: 600 as 600,
     lineHeight: 28,
   },
   subheading: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: 600 as 600,
     lineHeight: 28,
   },
   extraBold: {

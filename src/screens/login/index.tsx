@@ -4,6 +4,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Paths } from '../../navigation/path';
 import { useNavigation } from '@react-navigation/native';
 import UserAgreement from '../../components/footer/UserAgreement';
+import Start_Screen from '../Start_Screen';
 
 const Start = () => {
   const navigation = useNavigation();
@@ -29,7 +30,7 @@ const Start = () => {
 
         <View style={styles.welcomeTextContainer}>
           <Text style={styles.welcomeText}>Hello</Text>
-          <Text style={styles.welcomeText}>Welcome to Cove</Text>
+          <Text style={styles.welcomeText}>Welcome to Cover</Text>
           <Text style={styles.welcomeText}>Your safe space</Text>
         </View>
 
@@ -46,7 +47,7 @@ const Start = () => {
 
           <TouchableOpacity
             style={[styles.outlinedButton]}
-            onPress={() => {}}
+            onPress={Start_Screen}
             accessibilityLabel="Continue with Google"
           >
             <Text style={styles.outlinedButtonText}>Continue with Google</Text>

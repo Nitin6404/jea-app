@@ -14,7 +14,7 @@ export const START = 'start';
 export const END = 'end';
 
 interface CustomButtonProps {
-  onClick: () => void;
+  onPress: () => void;
   title: string;
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
@@ -24,7 +24,7 @@ interface CustomButtonProps {
 }
 
 const CustomButton = ({
-  onClick,
+  onPress,
   title,
   style,
   textStyle,
@@ -41,7 +41,7 @@ const CustomButton = ({
         style,
         { backgroundColor: disabled ? colors.onSurface : colors.primary },
       ]}
-      onPress={onClick}
+      onPress={onPress}
       disabled={disabled}
       accessibilityLabel={title}
     >

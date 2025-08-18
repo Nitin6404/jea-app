@@ -31,12 +31,19 @@ export const apiService = async ({
     // console.log(token)
 
     const requestObj = {
-      url: `${customUrl ? customUrl : BACKEND_URL}/${endpoint}`,
-      params,
-      method,
-      data,
-      signal,
-    };
+  url: `${customUrl ? customUrl : BACKEND_URL}/${endpoint}`,
+  params,
+  method,
+  data,
+  signal,
+  headers: {
+    'ngrok-skip-browser-warning': 'xyz',
+    ...headers,
+    ...(!removeToken && (token || _token)
+      ? { Authorization: `Bearer ${_token || token}` }
+      : {}),
+  },
+};
 
     if (token || _token) {
       requestObj.headers = {

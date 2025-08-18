@@ -19,4 +19,6 @@ export const endpoints = {
   markAsSensitive: 'api/user/mark-as-sensitive',
   markAsUnsensitive: 'api/user/marks-as-unsensitive',
   deleteMessages: 'api/user/delete-messages',
+  sendOtp: 'api/auth/send-otp',
+  resendOtp: 'api/auth/resend-otp',
 };
