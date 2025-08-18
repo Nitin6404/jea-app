@@ -158,6 +158,7 @@ const PhoneNumberVerification: React.FC<PhoneNumberVerificationProps> = ({
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { colors } = useThemeColors();
 
   const [time, setTime] = useState(30);
   const [isValidating, setIsValidating] = useState(false);
@@ -312,19 +313,31 @@ const PhoneNumberVerification: React.FC<PhoneNumberVerificationProps> = ({
 
   return (
     <>
-      <View style={styles.phoneOtpContainer}>
+      <View
+        style={[styles.phoneOtpContainer, { backgroundColor: colors.surface }]}
+      >
         <View style={styles.otpNumberContainer}>
-          <Text style={styles.otpNumberTextHeader}>
+          <Text style={[styles.otpNumberTextHeader, { color: colors.primary }]}>
             Verification code has been sent to{' '}
           </Text>
-          <Text style={[FontStyles.heading, styles.otpNumberTextSubHeader]}>
+          <Text
+            style={[
+              FontStyles.heading,
+              styles.otpNumberTextSubHeader,
+              { color: colors.primary },
+            ]}
+          >
             +{form.dialCode} {form.phoneNumber}
           </Text>
-          <View style={styles.otpContainer}>
+          <View
+            style={[styles.otpContainer, { backgroundColor: colors.surface }]}
+          >
             <CustomOtp onTextChange={onChangeOtp} />
             {time <= 0 ? (
               <TouchableOpacity onPress={onResendOtp}>
-                <Text style={styles.resendText}>Resend</Text>
+                <Text style={[styles.resendText, { color: colors.primary }]}>
+                  Resend
+                </Text>
               </TouchableOpacity>
             ) : (
               <Text style={styles.resendTextTimer}>Resend in {time}s</Text>
@@ -518,7 +531,6 @@ const styles = StyleSheet.create({
   // Phone OTP Verification Styles
   phoneOtpContainer: {
     flex: 1,
-    backgroundColor: '#181818',
   },
   phoneInputHeaderContainer: {
     display: 'flex',
@@ -556,7 +568,6 @@ const styles = StyleSheet.create({
     gap: 18,
   },
   otpNumberTextHeader: {
-    color: '#fff',
     fontSize: 16,
   },
   otpNumberTextSubHeader: {
