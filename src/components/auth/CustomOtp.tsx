@@ -69,7 +69,7 @@ const CustomOtp = ({
         containerStyle: styles.container,
         pinCodeContainerStyle: {
           ...styles.pinCodeContainer,
-          backgroundColor: colors.primary,
+          
         },
         pinCodeTextStyle: {
           ...styles.pinCodeText,
@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
   pinCodeContainer: {
     width: 50,
     height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    borderWidth: 3,
+    borderColor: '#9CD49F',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',

@@ -18,6 +18,7 @@ import { onResendOtp } from "../apis/onResendOtp";
 import { TOKEN } from "../constant/AUTH";
 import { Paths } from "../navigation/path";
 import useThemeColors from "../hooks/useThemeColors";
+import UserAgreementFooter from "../components/footer/UserAgreement";
 
 type Props = {
   goNext: () => void;
@@ -191,32 +192,33 @@ const PhoneNumberVerification: React.FC<Props> = ({
   }, []);
 
   return (
+ 
     <View
       style={[
-        commonStyles.container,
-        { backgroundColor: colors.surface, paddingHorizontal: 24 },
+        styles.header,
+        {  paddingHorizontal: 24 },
       ]}
     >
-      <Text style={[commonStyles.heading, { color: colors.primary }]}>
-        Enter verification code
+      
+      <Text style={[commonStyles.heading, { color: colors.primary },styles.subtitleText]}>
+        OTP Verification
       </Text>
 
       <Text style={styles.subtleText}>
-        Code sent to +{form.dialCode} {form.phoneNumber}
+        We will send you the one time password on this Mobile Number 
+      </Text>
+      <Text style={styles.number}>
+      +{form.dialCode} {form.phoneNumber}
       </Text>
 
       <View style={{ marginTop: 20, marginBottom: 8 }}>
         <CustomOtp onTextChange={setOtp} />
       </View>
+      <Text style={[styles.resend,{ color: colors.primary }]}>
+      {time} sec
+      </Text>
 
-      {time <= 0 ? (
-        <TouchableOpacity onPress={handleResendOtp}>
-          <Text style={[styles.resend, { color: colors.primary }]}>Resend</Text>
-        </TouchableOpacity>
-      ) : (
-        <Text style={styles.timerText}>Resend in {time}s</Text>
-      )}
-
+      
       <View style={{ marginTop: 24 }}>
         <CustomButton
           title="Verify code"
@@ -226,15 +228,50 @@ const PhoneNumberVerification: React.FC<Props> = ({
           style={commonStyles.button}
         />
       </View>
+    
+        <View style={{flexDirection:"row"}}>
+          <Text style={styles.normal}>Didn't received otp</Text>
+        <TouchableOpacity onPress={handleResendOtp}>
+          <Text style={[styles.esend, { color: colors.primary }]}>Send Otp</Text>
+        </TouchableOpacity>
+        
+        </View>
+      
+      <UserAgreementFooter></UserAgreementFooter>
+
     </View>
-  );
+   
+      );
 };
 
 const styles = StyleSheet.create({
+  header:{
+    flex: 1,
+     // default background
+    paddingHorizontal: 40,
+   
+    marginTop:20,
+  },
+  normal:{
+    marginTop:20,
+    marginHorizontal:90,
+    
+  },
+  number:{
+    fontSize:20,
+   marginLeft:90,
+   marginTop:15,
+
+  },
+subtitleText:{
+fontSize:24,
+
+},
   subtleText: {
     textAlign: "center",
     fontSize: 14,
     opacity: 0.8,
+    marginTop:20,
   },
   timerText: {
     textAlign: "center",
@@ -246,6 +283,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textDecorationLine: "underline",
     fontWeight: "600",
+  },
+  esend:{
+    marginTop:20,
+    marginRight:80,
   },
 });
 

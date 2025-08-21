@@ -30,17 +30,30 @@ const PhoneNumberForm : React.FC<PhoneNumberFormProps>= ({ goNext,goBack, form, 
   const { colors } = useThemeColors();
   const dispatch = useDispatch();
 
-  const onUserRegister = async () => {
+  // const onUserRegister = async () => {
+  //   if (form.phoneNumber.length === 10) {
+  //     const res = await onSendOtp({ payload: { phoneNumber: form.phoneNumber } });
+  //     if (res?.response?.success) {
+  //       dispatch(showSnackbar({ type: "success", title: "OTP sent", placement: "top" }));
+  //       goNext();
+  //     } else {
+  //       dispatch(showSnackbar({ type: "error", title: res?.response?.error || "Failed to send OTP", placement: "top" }));
+  //     }
+  //   } else {
+  //     dispatch(showSnackbar({ type: "error", title: "Enter a valid 10-digit phone number", placement: "top" }));
+  //   }
+  // };
+  const onUserRegister = () => {
     if (form.phoneNumber.length === 10) {
-      const res = await onSendOtp({ payload: { phoneNumber: form.phoneNumber } });
-      if (res?.response?.success) {
-        dispatch(showSnackbar({ type: "success", title: "OTP sent", placement: "top" }));
-        goNext();
-      } else {
-        dispatch(showSnackbar({ type: "error", title: res?.response?.error || "Failed to send OTP", placement: "top" }));
-      }
+      goNext();
     } else {
-      dispatch(showSnackbar({ type: "error", title: "Enter a valid 10-digit phone number", placement: "top" }));
+      dispatch(
+        showSnackbar({
+          type: 'error',
+          title: 'Please enter a valid 10-digit phone number',
+          placement: 'top',
+        }),
+      );
     }
   };
 
@@ -57,7 +70,12 @@ const PhoneNumberForm : React.FC<PhoneNumberFormProps>= ({ goNext,goBack, form, 
       <Image source={require("../assets/images/education-students.png")} style={{ width: 200, height: 200, alignSelf: "center" }} />
 
       <View style={commonStyles.inputWrapper}>
-        <CustomPhoneInput ref={phoneInput} value={form.phoneNumber} onChangeText={onChangeNumber} autoFocus={true} />
+        <CustomPhoneInput
+         ref={phoneInput} 
+         value={form.phoneNumber}
+          onChangeText={onChangeNumber} 
+          autoFocus={true}
+          />
       </View>
 
       <CustomButton title="Continue" onPress={onUserRegister} />
